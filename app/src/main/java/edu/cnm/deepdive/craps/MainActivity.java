@@ -10,8 +10,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import edu.cnm.deepdive.craps.R;
 import edu.cnm.deepdive.craps.model.Game;
+import edu.cnm.deepdive.craps.model.State;
 import edu.cnm.deepdive.craps.view.ImageRollAdapter;
 import edu.cnm.deepdive.craps.view.SimpleRollAdapter;
+import java.util.List;
 import java.util.Random;
 import org.apache.commons.rng.simple.JDKRandomBridge;
 import org.apache.commons.rng.simple.RandomSource;
@@ -92,39 +94,61 @@ public class MainActivity extends AppCompatActivity {
   private void playOne() {
     game.reset();
     game.play();
-    updateRollsDisplay();
-    updateTallyDisplay();
+    updateRollsDisplay(game.getRolls(), game.getState());
+    updateTallyDisplay(game.getWins(), game.getLosses());
   }
 
   private void playFast() {
     running = true;
     invalidateOptionsMenu();
-    // TODO Implement code for running games on separate thread.
+    new Runner().start();
   }
 
   private void pause() {
     running = false;
-    invalidateOptionsMenu();
-    // TODO Implement code for killing separate thread.
   }
 
   private void reset() {
     game = new Game(rng);
-    updateTallyDisplay();
+    updateTallyDisplay(0, 0);
   }
 
-  private void updateRollsDisplay() {
+  private void updateRollsDisplay(List<int[]> rolls, State state) {
     adapter.clear();
-    ((ImageRollAdapter) adapter).setState(game.getState());
-    adapter.addAll(game.getRolls());
+    ((ImageRollAdapter) adapter).setState(state);
+    adapter.addAll(rolls);
   }
 
-  private void updateTallyDisplay() {
-    long wins = game.getWins();
-    long plays = wins + game.getLosses();
+  private void updateTallyDisplay(long wins, long losses) {
+    long plays = wins + losses;
     double percentage = (plays > 0) ? 100.0 * wins / plays : 0;
     String tallyString = getString(R.string.tally, wins, plays, percentage);
     tally.setText(tallyString);
+  }
+
+  private class Runner extends Thread {
+
+    private long wins;
+    private long losses;
+    @Override
+    public void run() {
+      while (running) {
+        for (int i = 0; i < 1000; i++) {
+          game.reset();
+          game.play();
+        }
+         wins = game.getWins();
+         losses = game.getLosses();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            updateTallyDisplay(wins, losses);
+          }
+        });
+      }
+      invalidateOptionsMenu();
+    }
+
   }
 
 }
