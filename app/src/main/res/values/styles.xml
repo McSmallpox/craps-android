@@ -10,21 +10,23 @@
 
   <style name="TallyStyle" parent="AppTheme">
     <item name="android:textSize">14sp</item>
-    <item name="android:textStyle"></item>
+    <item name="android:textStyle">bold</item>
   </style>
+
   <style name="DiceText" parent="AppTheme">
     <item name="android:textSize">18sp</item>
     <item name="android:textStyle">bold</item>
   </style>
-<style name="DiceImage" parent="AppTheme">
-  <item name="android:layout_margin">8dp</item>
 
+  <style name="DiceImage" parent="AppTheme">
+    <item name="android:layout_margin">8dp</item>
+  </style>
 
   <style name="DiceSum" parent="AppTheme">
-    <style> name="android:layout_width">50dp</style>
+    <item name="android:layout_width">50dp</item>
     <item name="android:textSize">20sp</item>
     <item name="android:textStyle">bold</item>
   </style>
 
-</style>
+
 </resources>

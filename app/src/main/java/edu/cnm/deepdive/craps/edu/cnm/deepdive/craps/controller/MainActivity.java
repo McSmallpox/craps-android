@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.craps.controller;
+package edu.cnm.deepdive.craps.edu.cnm.deepdive.craps.controller;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -130,19 +130,34 @@ public class MainActivity extends AppCompatActivity {
 
     private long wins;
     private long losses;
+    private int updateCycles;
+    private List<int[]> rolls;
+    private edu.cnm.deepdive.craps.model.State state;
+
     @Override
     public void run() {
       while (running) {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10_000; i++) {
           game.reset();
           game.play();
         }
-         wins = game.getWins();
-         losses = game.getLosses();
+        updateCycles++;
+        wins = game.getWins();
+        losses = game.getLosses();
+        if (updateCycles % 5 == 0) {
+          rolls = game.getRolls();
+          state = game.getState();
+        } else {
+          rolls = null;
+          state = null;
+        }
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
             updateTallyDisplay(wins, losses);
+            if (state != null) {
+              updateRollsDisplay(rolls, state);
+            }
           }
         });
       }
